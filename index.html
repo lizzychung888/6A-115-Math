@@ -42,6 +42,15 @@
             transform: translateY(4px);
             box-shadow: 0 2px 0 #D97706, 0 4px 6px rgba(245, 158, 11, 0.2);
         }
+        .btn-jelly-purple {
+            background-color: #8B5CF6;
+            box-shadow: 0 6px 0 #7C3AED, 0 8px 14px rgba(139, 92, 246, 0.25);
+            transition: all 0.12s ease;
+        }
+        .btn-jelly-purple:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7C3AED, 0 4px 6px rgba(139, 92, 246, 0.2);
+        }
         .btn-jelly-rose {
             background-color: #F43F5E;
             box-shadow: 0 6px 0 #E11D48, 0 8px 14px rgba(244, 63, 94, 0.25);
@@ -122,7 +131,7 @@
                         六上數學糖果島大冒險
                         <span class="text-xs bg-rose-500 text-white font-black px-2.5 py-1 rounded-full shadow-sm">康軒版 1~5 單元</span>
                     </h1>
-                    <p class="text-sm md:text-base font-bold text-slate-500">直觀規律 ‧ 拒絕混淆 ‧ 掌握單一標準解法</p>
+                    <p class="text-sm md:text-base font-bold text-slate-500">直觀規律 ‧ 答錯退回類似題 ‧ 基礎與中上進階雙模式</p>
                 </div>
             </div>
 
@@ -158,14 +167,34 @@
     <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
         <!-- Section: Adventure Map & Quiz -->
         <div id="section-adventure" class="space-y-6">
+
+            <!-- Difficulty Mode Switcher Card -->
+            <div class="bg-gradient-to-r from-amber-100 via-orange-100 to-rose-100 rounded-3xl p-4 md:p-5 border-4 border-amber-300 shadow-md flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl md:text-3xl">⚔️</span>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-black text-amber-950">挑戰難度切換</h3>
+                        <p class="text-xs md:text-sm font-bold text-amber-800">可自由選擇「標準核心題」或挑戰具深度的「中上進階題」！</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-2xl border-2 border-amber-300 shadow-inner">
+                    <button id="btnModeNormal" onclick="setDifficultyMode('normal')" class="px-4 py-2 rounded-xl font-black text-sm md:text-base transition bg-amber-500 text-white shadow">
+                        🌱 基礎核心闖關
+                    </button>
+                    <button id="btnModeAdvanced" onclick="setDifficultyMode('advanced')" class="px-4 py-2 rounded-xl font-black text-sm md:text-base transition text-purple-800 hover:bg-purple-50">
+                        🔥 菁英進階挑戰 (中上難度)
+                    </button>
+                </div>
+            </div>
+
             <!-- Unit Selector -->
             <div class="bg-white rounded-3xl p-4 md:p-6 border-4 border-amber-200 card-pop">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                     <h2 class="text-xl md:text-2xl font-black text-slate-800 flex items-center gap-2">
                         🏝️ 選擇探險單元小島
                     </h2>
-                    <span class="text-sm font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
-                        答對前進 ‧ 答錯退回並做同考點強化題
+                    <span id="modeStatusPill" class="text-sm font-black text-amber-800 bg-amber-100 px-3.5 py-1 rounded-full border border-amber-200">
+                        當前模式：🌱 基礎核心模式
                     </span>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="unitBtnContainer">
@@ -174,11 +203,11 @@
             </div>
 
             <!-- Adventure Map Board -->
-            <div class="bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 rounded-3xl p-6 border-4 border-emerald-200 shadow-md relative overflow-hidden">
+            <div id="mapBoardContainer" class="bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 rounded-3xl p-6 border-4 border-emerald-200 shadow-md relative overflow-hidden transition-all duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <span id="currentUnitTitle" class="text-xl md:text-2xl font-black text-emerald-800">單元 1：最大公因數與最小公倍數</span>
-                        <p class="text-sm md:text-base font-bold text-slate-600">幫助探險貓咪隊長走到終點打開金幣寶箱！</p>
+                        <p id="mapSubtitle" class="text-sm md:text-base font-bold text-slate-600">幫助探險貓咪隊長走到終點打開金幣寶箱！</p>
                     </div>
                     <div class="bg-white/90 px-4 py-2 rounded-2xl border-2 border-emerald-300 font-black text-emerald-700 text-base shadow-sm">
                         進度：第 <span id="currentStageNum" class="text-2xl text-emerald-600">1</span> / 5 關
@@ -207,6 +236,9 @@
                         </span>
                         <span id="questionTopicBadge" class="bg-sky-100 text-sky-800 text-sm md:text-base font-bold px-3 py-1 rounded-xl">
                             基本概念
+                        </span>
+                        <span id="questionDifficultyTag" class="bg-emerald-100 text-emerald-800 text-xs md:text-sm font-black px-2.5 py-1 rounded-lg">
+                            基礎核心
                         </span>
                     </div>
                     <div class="text-sm font-bold text-slate-400">
@@ -535,14 +567,15 @@
     <!-- Application Data & Logic -->
     <script>
         // State variables
+        let difficultyMode = 'normal'; // 'normal' (基礎核心) or 'advanced' (中上進階)
         let currentUnitIndex = 0; // 0 to 4 (Units 1 to 5)
         let currentStageIndex = 0; // 0 to 4 (Stages 1 to 5)
         let isAnsweringSimilar = false; // flag if currently taking fallback similar question
         let totalStars = 0;
         let mistakesBook = [];
 
-        // Question Database: 5 Units, each with 5 stages. Each stage has 'primary' and 'similar'.
-        const questDatabase = [
+        // Question Database - Normal Mode (基礎核心題)
+        const questDatabaseNormal = [
             // UNIT 1: 最大公因數與最小公倍數
             {
                 unitTitle: "單元 1：最大公因數與最小公倍數",
@@ -742,7 +775,7 @@
                 ]
             },
 
-            // UNIT 3: 數量關係與規律 (包含吸管正方形、圓點、牙籤六邊形、火柴棒餐桌)
+            // UNIT 3: 數量關係與規律
             {
                 unitTitle: "單元 3：數量關係與規律",
                 stages: [
@@ -946,7 +979,7 @@
                 ]
             },
 
-            // UNIT 5: 比與比值 (包含 1700 人按比例分配題目)
+            // UNIT 5: 比與比值
             {
                 unitTitle: "單元 5：比與比值",
                 stages: [
@@ -1038,6 +1071,474 @@
                 ]
             }
         ];
+
+        // Question Database - Advanced Mode (🔥 菁英進階題：中上程度，取材自試卷)
+        const questDatabaseAdvanced = [
+            // UNIT 1: 最大公因數與最小公倍數 (進階)
+            {
+                unitTitle: "單元 1：最大公因數與最小公倍數 (進階)",
+                stages: [
+                    {
+                        topic: "質因數分解與質因數總和",
+                        primary: {
+                            question: "【試卷改編】將 84 進行質因數分解後，84 的「所有質因數」相加的總和是多少？",
+                            options: ["12", "14", "24", "44"],
+                            answerIndex: 0,
+                            explanation: "84 = 2 × 2 × 3 × 7。84 的質因數（不重複）是 2、3、7，其總和為 2 + 3 + 7 = 12。（注意：因數有 1, 2, 3, 4, 6, 7, 12, 14, 21, 28, 42, 84，但質因數只有 2、3、7）。"
+                        },
+                        similar: {
+                            question: "【強化類似題】將 56 進行質因數分解，56 的「所有質因數」相乘的結果是多少？",
+                            options: ["14", "18", "28", "56"],
+                            answerIndex: 0,
+                            explanation: "56 = 2 × 2 × 2 × 7。56 的質因數只有 2 和 7 兩個，相乘為 2 × 7 = 14。"
+                        }
+                    },
+                    {
+                        topic: "三數最大公因數短除法",
+                        primary: {
+                            question: "【試卷計算題】用短除法找出 24、36 和 18 的最大公因數是多少？",
+                            options: ["2", "3", "6", "72"],
+                            answerIndex: 2,
+                            explanation: "求三數的最大公因數時，左側質因數必須能同時整除三個數！24、36、18 同除以 2 得 12、18、9；再同除以 3 得 4、6、3（無法再被同一質數整除）。最大公因數 = 2 × 3 = 6。"
+                        },
+                        similar: {
+                            question: "【強化類似題】用短除法求 30、45 和 105 的最大公因數是多少？",
+                            options: ["5", "15", "30", "315"],
+                            answerIndex: 1,
+                            explanation: "三數先同除以 3 得 10、15、35；再同除以 5 得 2、3、7。最大公因數 = 3 × 5 = 15。"
+                        }
+                    },
+                    {
+                        topic: "較大數最小公倍數",
+                        primary: {
+                            question: "【試卷計算題】工廠有兩個運轉齒輪，齒數分別是 45 齒與 75 齒，求 45 和 75 的最小公倍數是多少？",
+                            options: ["15", "150", "225", "3375"],
+                            answerIndex: 2,
+                            explanation: "短除法：45 與 75 同除以 3 得 15 與 25；再同除以 5 得 3 與 5。最小公倍數乘 L 型：3 × 5 × 3 × 5 = 225。"
+                        },
+                        similar: {
+                            question: "【強化類似題】用長 15 公分、寬 25 公分、高 6 公分的積木拼成正方形底面，求 15 和 25 的最小公倍數是多少？",
+                            options: ["40", "75", "150", "375"],
+                            answerIndex: 1,
+                            explanation: "15 = 3 × 5，25 = 5 × 5，最小公倍數 [15, 25] = 3 × 5 × 5 = 75。"
+                        }
+                    },
+                    {
+                        topic: "互質與最簡整數比概念判斷",
+                        primary: {
+                            question: "【試卷概念題】下列四個敘述中，哪一個是「完全正確」的？",
+                            options: [
+                                "兩個數互質，這兩個數一定都是質數",
+                                "兩個數互質，這兩個數的比一定是最簡整數比",
+                                "48 和 35 的最大公因數是 7",
+                                "所有的合數兩兩之間一定不會互質"
+                            ],
+                            answerIndex: 1,
+                            explanation: "兩個數互質代表最大公因數是 1，因此以這兩數組成的比（如 8:9 或 35:48）無法再約分，必定是最簡整數比！8 和 9 都是合數但互質，故 A、D 錯誤；(48, 35) = 1，故 C 錯誤。"
+                        },
+                        similar: {
+                            question: "【強化類似題】48 和 35 的最大公因數是哪一個？",
+                            options: ["1", "3", "5", "7"],
+                            answerIndex: 0,
+                            explanation: "48 = 2^4 × 3；35 = 5 × 7。兩數沒有共同質因數，最大公因數是 1（兩數互質）。"
+                        }
+                    },
+                    {
+                        topic: "三數最大公因數生活應用",
+                        primary: {
+                            question: "【試卷勾選題改編】園遊會準備了 14 顆紅氣球、56 顆藍氣球和 63 顆黃氣球，要平分包裝成禮袋，每袋各色氣球一樣多且剛好分完，最多可分裝成幾袋？",
+                            options: ["2 袋", "7 袋", "14 袋", "28 袋"],
+                            answerIndex: 1,
+                            explanation: "求 14、56、63 的最大公因數：14 = 2×7，56 = 2^3×7，63 = 3^2×7。三數的最大公因數為 7，故最多可分裝 7 袋。"
+                        },
+                        similar: {
+                            question: "【強化類似題】長方體木塊長 24 公分、寬 36 公分、高 18 公分，要切成大小相同且最大的正方體，正方體的邊長是幾公分？",
+                            options: ["2 公分", "3 公分", "6 公分", "12 公分"],
+                            answerIndex: 2,
+                            explanation: "求三邊長的最大公因數：(24, 36, 18) = 6 公分。"
+                        }
+                    }
+                ]
+            },
+
+            // UNIT 2: 分數除法 (進階)
+            {
+                unitTitle: "單元 2：分數的除法 (進階)",
+                stages: [
+                    {
+                        topic: "代數式除法大小推理（試卷經典難題）",
+                        primary: {
+                            question: "【試卷選擇第 1 題】如果「2 又 3/4 ÷ A ＝ 4/11 ÷ B」，且算出來的商大於 0，那麼 A 和 B 哪一個比較大？",
+                            options: ["A 比較大", "B 比較大", "一樣大", "無法比較"],
+                            answerIndex: 0,
+                            explanation: "2 又 3/4 = 11/4 = 2.75；而 4/11 ≈ 0.36。因為被除數 11/4 遠大於 4/11，若要讓兩邊算出來的「商相等」，被除數大的算式其除數也必須等比例較大，因此 A > B！"
+                        },
+                        similar: {
+                            question: "【強化類似題】若「1 又 1/2 ÷ 甲 ＝ 2/3 ÷ 乙」（商大於 0），那麼甲和乙的關係為何？",
+                            options: ["甲 > 乙", "甲 < 乙", "甲 = 乙", "無法比較"],
+                            answerIndex: 0,
+                            explanation: "1 又 1/2 (3/2) > 2/3。被除數較大時，除數甲也必須比乙大，才能得到相等的商。"
+                        }
+                    },
+                    {
+                        topic: "商比被除數小的多重判斷",
+                        primary: {
+                            question: "【試卷圈圈看第 1 題】下列四個算式中，哪一個算出來的答案會「比 56 還要小」？",
+                            options: ["56 ÷ 2/3", "56 ÷ 8/25", "56 ÷ 1 又 1/7", "56 ÷ 1"],
+                            answerIndex: 2,
+                            explanation: "只有當「除數大於 1」時，商才會比被除數小！1 又 1/7 (8/7) > 1，因此 56 ÷ 1 又 1/7 < 56。除以真分數 2/3、8/25 都會大於 56。"
+                        },
+                        similar: {
+                            question: "【強化類似題】下列哪一個算式計算後的結果會「大於 56」？",
+                            options: ["56 ÷ 1 又 1/2", "56 ÷ 2 又 5/8", "56 ÷ 8/25", "56 ÷ 1"],
+                            answerIndex: 2,
+                            explanation: "除數 8/25 < 1，除以小於 1 的真分數，商會大於原本的被除數 56。"
+                        }
+                    },
+                    {
+                        topic: "幾何面積逆算高（試卷難題）",
+                        primary: {
+                            question: "【試卷填填看第 4 題】有一個三角形，面積是 25 平方公分，底邊長 3 又 3/4 公分，高是幾公分？",
+                            options: ["6 又 2/3 公分", "13 又 1/3 公分", "9 又 3/8 公分", "18 又 3/4 公分"],
+                            answerIndex: 1,
+                            explanation: "三角形面積 = 底 × 高 ÷ 2，因此 高 = 面積 × 2 ÷ 底！25 × 2 = 50。50 ÷ 3 又 3/4 = 50 ÷ 15/4 = 50 × 4/15 = 40/3 = 13 又 1/3 公分！"
+                        },
+                        similar: {
+                            question: "【強化類似題】三角形面積為 15 平方公尺，高為 2 又 1/2 公尺，底邊長是多少公尺？",
+                            options: ["6 公尺", "12 公尺", "15 公尺", "30 公尺"],
+                            answerIndex: 1,
+                            explanation: "底 = 面積 × 2 ÷ 高 = 15 × 2 ÷ 5/2 = 30 × 2/5 = 12 公尺。"
+                        }
+                    },
+                    {
+                        topic: "帶分數異分母除法應用",
+                        primary: {
+                            question: "【試卷應用題第 1 題】水果行每 3 又 5/6 公斤的蘋果裝成一箱，現有 11 又 1/2 公斤的蘋果，全部裝完可以裝成多少箱？",
+                            options: ["2 箱", "3 箱", "4 箱", "3 又 1/2 箱"],
+                            answerIndex: 1,
+                            explanation: "11 又 1/2 ÷ 3 又 5/6 = 23/2 ÷ 23/6 = 23/2 × 6/23 = 3 箱。"
+                        },
+                        similar: {
+                            question: "【強化類似題】裁縫師有 24 又 1/2 公尺長的花布，每 1 又 3/4 公尺做成一件背心，全部用完共可做成多少件背心？",
+                            options: ["12 件", "14 件", "16 件", "18 件"],
+                            answerIndex: 1,
+                            explanation: "24 又 1/2 ÷ 1 又 3/4 = 49/2 ÷ 7/4 = 49/2 × 4/7 = 14 件。"
+                        }
+                    },
+                    {
+                        topic: "同分母除法直觀化簡",
+                        primary: {
+                            question: "【試卷選擇第 2 題】計算「5 又 3/5 ÷ 2 又 2/5」時，化為假分數後，可以直接簡化為下列哪一個算式？",
+                            options: ["53 ÷ 22", "28 ÷ 12", "55 ÷ 25", "3 ÷ 2"],
+                            answerIndex: 1,
+                            explanation: "5 又 3/5 = 28/5，2 又 2/5 = 12/5。因為分母都是 5，同分母分數相除可直接由分子相除，即 28 ÷ 12 = 28/12 = 7/3 = 2 又 1/3。"
+                        },
+                        similar: {
+                            question: "【強化類似題】計算「3 又 1/7 ÷ 1 又 4/7」時，化為分子相除的算式是哪一個？",
+                            options: ["22 ÷ 11", "31 ÷ 14", "3 ÷ 4", "22 ÷ 7"],
+                            answerIndex: 0,
+                            explanation: "3 又 1/7 = 22/7，1 又 4/7 = 11/7，同分母直接分子相除：22 ÷ 11 = 2。"
+                        }
+                    }
+                ]
+            },
+
+            // UNIT 3: 數量關係與規律 (進階)
+            {
+                unitTitle: "單元 3：數量關係與規律 (進階)",
+                stages: [
+                    {
+                        topic: "三角形圓圈累加規律（試卷二第 1 題與十）",
+                        primary: {
+                            question: "【試卷看圖填填看】觀察圓圈排列規律：圖①有 1 個，圖②有 1+2=3 個，圖③有 1+2+3=6 個，圖④有 1+2+3+4=10 個...排出「圖⑥」一共需要幾個圓圈？",
+                            options: ["15 個", "18 個", "21 個", "28 個"],
+                            answerIndex: 2,
+                            explanation: "這是經典的三角形數規律！圖⑥是連續整數相加：1 + 2 + 3 + 4 + 5 + 6 = 21 個。"
+                        },
+                        similar: {
+                            question: "【強化類似題】承上題三角形數規律，如果要排出「圖⑦」，一共需要幾個圓圈？",
+                            options: ["21 個", "25 個", "28 個", "35 個"],
+                            answerIndex: 2,
+                            explanation: "圖⑦ = 1 + 2 + 3 + 4 + 5 + 6 + 7 = 28 個。"
+                        }
+                    },
+                    {
+                        topic: "十字形放射擴散規律（試卷二第 5 題）",
+                        primary: {
+                            question: "【試卷畫畫看改編】十字形排球圖：中心永遠有 1 個球，上、下、左、右四個分支各有 n 個球。圖①分支各 1 個共 5 個；圖②分支各 2 個共 9 個（每次 +4）。請問「圖⑤」共有幾個球？",
+                            options: ["17 個", "20 個", "21 個", "25 個"],
+                            answerIndex: 2,
+                            explanation: "中心 1 個 + 四個分支各 5 個：1 + 4 × 5 = 21 個（或套用標準口訣：圖 1 是 5 個，5 + 4 × (5 - 1) = 5 + 16 = 21 個）。"
+                        },
+                        similar: {
+                            question: "【強化類似題】同上十字形規律，若要排出「圖⑧」，一共需要幾個球？",
+                            options: ["29 個", "32 個", "33 個", "36 個"],
+                            answerIndex: 2,
+                            explanation: "中心 1 個 + 4 個分支各 8 個：1 + 4 × 8 = 33 個。"
+                        }
+                    },
+                    {
+                        topic: "階梯金字塔方塊數（試卷二第 4 題）",
+                        primary: {
+                            question: "【試卷畫畫看第 4 題】觀察階梯狀正方形積木排列：圖①有 1 塊，圖②有 1+2=3 塊，圖③有 1+2+3=6 塊，圖④有 1+2+3+4=10 塊...排出「圖⑤」要用幾塊積木？",
+                            options: ["12 塊", "15 塊", "18 塊", "20 塊"],
+                            answerIndex: 1,
+                            explanation: "階梯累加：圖⑤ = 1 + 2 + 3 + 4 + 5 = 15 塊積木。"
+                        },
+                        similar: {
+                            question: "【強化類似題】同階梯方塊規律，如果排出「圖⑥」，一共需要幾塊積木？",
+                            options: ["18 塊", "20 塊", "21 塊", "24 塊"],
+                            answerIndex: 2,
+                            explanation: "圖⑥ = 15 + 6 = 21 塊積木。"
+                        }
+                    },
+                    {
+                        topic: "植樹改距不移動問題（公倍數結合）",
+                        primary: {
+                            question: "【資優進階題】一條長 360 公尺的林蔭道一旁，原本每 12 公尺種一棵樹（兩端都有種）。現在改為每 15 公尺種一棵樹，兩端都不移，請問共有「幾棵樹不用移動」？",
+                            options: ["5 棵", "6 棵", "7 棵", "8 棵"],
+                            answerIndex: 2,
+                            explanation: "不用移動的樹位於 12 與 15 的「公倍數」位置！[12, 15] = 60 公尺。360 ÷ 60 = 6 個間隔。因為兩端都算，共有 6 + 1 = 7 棵樹不需要移動。"
+                        },
+                        similar: {
+                            question: "【強化類似題】長 180 公尺的走廊，原本每 6 公尺掛彩帶，改為每 9 公尺掛彩帶，起點與終點都有掛且不移動，有幾處彩帶位置完全不用更動？",
+                            options: ["9 處", "10 處", "11 處", "12 處"],
+                            answerIndex: 2,
+                            explanation: "[6, 9] = 18 公尺。180 ÷ 18 = 10 個間隔，兩端都算：10 + 1 = 11 處。"
+                        }
+                    },
+                    {
+                        topic: "敲鐘間隔問題（經典思維陷阱）",
+                        primary: {
+                            question: "【經典進階題】古老大鐘報時，下午 4 點敲 4 下共費時 6 秒。那麼當晚上 8 點敲 8 下時，一共需要多少秒？",
+                            options: ["12 秒", "14 秒", "16 秒", "18 秒"],
+                            answerIndex: 1,
+                            explanation: "敲鐘問題關鍵在「間隔數」！敲 4 下之間只有 (4 - 1) = 3 個間隔，每個間隔費時 6 ÷ 3 = 2 秒；敲 8 下有 (8 - 1) = 7 個間隔，因此需要 7 × 2 = 14 秒！"
+                        },
+                        similar: {
+                            question: "【強化類似題】工人在路邊鋸木頭，把一根木頭鋸成 5 段花了 12 分鐘，如果以同樣速度把木頭鋸成 8 段，需要花幾分鐘？",
+                            options: ["18 分鐘", "21 分鐘", "24 分鐘", "28 分鐘"],
+                            answerIndex: 1,
+                            explanation: "鋸成 5 段需鋸 4 次，每次花 12 ÷ 4 = 3 分鐘；鋸成 8 段需鋸 7 次，需要 7 × 3 = 21 分鐘。"
+                        }
+                    }
+                ]
+            },
+
+            // UNIT 4: 小數除法 (進階)
+            {
+                unitTitle: "單元 4：小數除法 (進階)",
+                stages: [
+                    {
+                        topic: "複合小數倍數差逆推（試卷應用題第 3 題）",
+                        primary: {
+                            question: "【試卷應用題第 3 題】葡萄園面積的 0.8 倍是 25.76 平方公尺，西瓜田面積的 1.8 倍是 38.7 平方公尺，請問葡萄園和西瓜田的面積相差多少平方公尺？",
+                            options: ["8.5 平方公尺", "10.7 平方公尺", "12.4 平方公尺", "14.2 平方公尺"],
+                            answerIndex: 1,
+                            explanation: "葡萄園面積 = 25.76 ÷ 0.8 = 32.2 平方公尺；西瓜田面積 = 38.7 ÷ 1.8 = 21.5 平方公尺。兩者相差：32.2 - 21.5 = 10.7 平方公尺。"
+                        },
+                        similar: {
+                            question: "【強化類似題】甲數的 0.4 倍是 14.4，乙數的 1.5 倍是 40.5，甲、乙兩數相差多少？",
+                            options: ["7", "9", "11", "13"],
+                            answerIndex: 1,
+                            explanation: "甲 = 14.4 ÷ 0.4 = 36；乙 = 40.5 ÷ 1.5 = 27。相差 36 - 27 = 9。"
+                        }
+                    },
+                    {
+                        topic: "小數倍數和逆算（試卷填填看第 1 題）",
+                        primary: {
+                            question: "【試卷填填看第 1 題】甲、乙兩數，甲數是乙數的 0.63 倍，已知甲數是 49.14，請問「甲、乙兩數的和」是多少？",
+                            options: ["78", "127.14", "128", "135.24"],
+                            answerIndex: 1,
+                            explanation: "乙數 = 甲數 ÷ 0.63 = 49.14 ÷ 0.63 = 78。兩數的和 = 49.14 + 78 = 127.14。"
+                        },
+                        similar: {
+                            question: "【強化類似題】小明的體重是小華的 0.85 倍，已知小明重 44.2 公斤，兩人體重合起來共多少公斤？",
+                            options: ["94.2 公斤", "96.2 公斤", "98.2 公斤", "102 公斤"],
+                            answerIndex: 1,
+                            explanation: "小華 = 44.2 ÷ 0.85 = 52 公斤。合起來 = 44.2 + 52 = 96.2 公斤。"
+                        }
+                    },
+                    {
+                        topic: "合金比例分配逆算（試卷應用題第 5 題）",
+                        primary: {
+                            question: "【試卷應用題第 5 題】黃銅是由銅和鋅混合而成，3.6 公斤的黃銅中含有 2.34 公斤的銅，那麼 1 公斤的黃銅中含有幾公斤的「鋅」？",
+                            options: ["0.65 公斤", "0.45 公斤", "0.35 公斤", "0.25 公斤"],
+                            answerIndex: 2,
+                            explanation: "1 公斤黃銅含銅量 = 2.34 ÷ 3.6 = 0.65 公斤。因為黃銅只有銅和鋅，故 1 公斤黃銅中含鋅量 = 1 - 0.65 = 0.35 公斤！"
+                        },
+                        similar: {
+                            question: "【強化類似題】5 公斤的鹽水中溶有 0.35 公斤的鹽，請問 1 公斤的該鹽水中含有多少公斤的水？",
+                            options: ["0.07 公斤", "0.93 公斤", "0.85 公斤", "0.95 公斤"],
+                            answerIndex: 1,
+                            explanation: "1 公斤含鹽 0.35 ÷ 5 = 0.07 公斤，含水量 = 1 - 0.07 = 0.93 公斤。"
+                        }
+                    },
+                    {
+                        topic: "除法大小關係真假判斷（試卷選擇第 5 題）",
+                        primary: {
+                            question: "【試卷選擇第 5 題】下列哪一個數學判斷選項是「正確」的？",
+                            options: [
+                                "0.1 ÷ 0.1 ＜ 0.1",
+                                "1.1 ÷ 1.1 ＞ 1.1",
+                                "0.01 ÷ 0.01 ＜ 0.01",
+                                "1.1 ÷ 1 ＞ 1"
+                            ],
+                            answerIndex: 3,
+                            explanation: "任何數除以自己都等於 1，故 0.1÷0.1=1 > 0.1 (A錯)；1.1÷1.1=1 < 1.1 (B錯)；0.01÷0.01=1 > 0.01 (C錯)；而 1.1÷1 = 1.1，1.1 > 1 完全正確！"
+                        },
+                        similar: {
+                            question: "【強化類似題】下列關於小數除法的敘述，何者正確？",
+                            options: [
+                                "除數小於 1 時，商一定比被除數小",
+                                "被除數和除數同時乘以 10，商會變大 10 倍",
+                                "被除數和除數同時乘以 10，商不變",
+                                "0 除以任何小數都等於 1"
+                            ],
+                            answerIndex: 2,
+                            explanation: "商不變性質：被除數與除數同乘或同除以同一個不為 0 的數，商保持不變。"
+                        }
+                    },
+                    {
+                        topic: "整數除以小數生產工時（試卷填填看第 2 題）",
+                        primary: {
+                            question: "【試卷填填看第 2 題】紡織廠織布機每小時可織 5.15 公尺的布，現要織 103 公尺的布，需要幾小時？",
+                            options: ["18 小時", "20 小時", "22 小時", "25 小時"],
+                            answerIndex: 1,
+                            explanation: "時間 = 總長度 ÷ 每小時產量 = 103 ÷ 5.15 = 10300 ÷ 515 = 20 小時。"
+                        },
+                        similar: {
+                            question: "【強化類似題】手工藝老師做一朵緞帶花需要 1.125 公尺緞帶，現在有 54 公尺緞帶全部做完，可做幾朵？",
+                            options: ["42 朵", "45 朵", "48 朵", "52 朵"],
+                            answerIndex: 2,
+                            explanation: "54 ÷ 1.125 = 54000 ÷ 1125 = 48 朵。"
+                        }
+                    }
+                ]
+            },
+
+            // UNIT 5: 比與比值 (進階)
+            {
+                unitTitle: "單元 5：比與比值 (進階)",
+                stages: [
+                    {
+                        topic: "工程工作量倒數比（試卷經典難題）",
+                        primary: {
+                            question: "【試卷填填看第 5 題】有一項工程，甲自己獨做 8 天可以完工。已知甲、乙兩人每日工作量的比是「1/8 : 1/12」，如果換成乙自己來做這項工程，需要幾天可以完工？",
+                            options: ["8 天", "10 天", "12 天", "16 天"],
+                            answerIndex: 2,
+                            explanation: "甲每天完成全工程的 1/8。由比可知乙每天完成全工程的 1/12。因此乙獨做所需天數 = 1 ÷ (1/12) = 12 天完工！"
+                        },
+                        similar: {
+                            question: "【強化類似題】修築一條馬路，A 隊獨做 10 天完成，A、B 兩隊每日工作量之比為 1/10 : 1/15，若由 B 隊單獨修築，需要幾天？",
+                            options: ["12 天", "15 天", "20 天", "25 天"],
+                            answerIndex: 1,
+                            explanation: "B 隊每日完成 1/15，所需天數 = 1 ÷ (1/15) = 15 天。"
+                        }
+                    },
+                    {
+                        topic: "帶分數與小數化最簡整數比（試卷計算第 3 題）",
+                        primary: {
+                            question: "【試卷計算題第 3 題】把比「3 又 1/2 : 4.2」化成最簡整數比是多少？",
+                            options: ["5 : 6", "6 : 5", "35 : 42", "7 : 8"],
+                            answerIndex: 0,
+                            explanation: "3 又 1/2 = 3.5。3.5 : 4.2 先同乘 10 變 35 : 42；再同除以最大公因數 7，得到最簡整數比 5 : 6。"
+                        },
+                        similar: {
+                            question: "【強化類似題】把比「1 又 1/3 : 1 又 1/5」化成最簡整數比是多少？",
+                            options: ["3 : 5", "5 : 3", "9 : 10", "10 : 9"],
+                            answerIndex: 3,
+                            explanation: "4/3 : 6/5，兩邊同乘 15 得 20 : 18，再同除以 2 得 10 : 9。"
+                        }
+                    },
+                    {
+                        topic: "影長比值反推旗桿高度（試卷選擇第 3 題）",
+                        primary: {
+                            question: "【試卷選擇第 3 題】在上午 9 時的陽光下，公園裡測得「樹高對影子長度的比值是 3/2」。同一時刻若一根旗桿的高度是 150 公分，旗桿的影子長是多少公分？",
+                            options: ["75 公分", "90 公分", "100 公分", "225 公分"],
+                            answerIndex: 2,
+                            explanation: "高度 : 影長 = 3 : 2（比值為 3/2）。旗桿高度 150 公分，150 ÷ 3 × 2 = 100 公分（影子長 100 公分）。"
+                        },
+                        similar: {
+                            question: "【強化類似題】在某一時刻，物體高度與影長的比是 4 : 3。如果測得大樓影長為 36 公尺，這棟大樓的高度是多少公尺？",
+                            options: ["27 公尺", "45 公尺", "48 公尺", "54 公尺"],
+                            answerIndex: 2,
+                            explanation: "高度 : 36 = 4 : 3。影長 3 放大 12 倍是 36，高度 = 4 × 12 = 48 公尺。"
+                        }
+                    },
+                    {
+                        topic: "相等的比求門寬（試卷應用題第 4 題）",
+                        primary: {
+                            question: "【試卷應用題第 4 題】大門設計師設計了一扇門，門的高和寬的比是 14 : 5。如果這扇門的高是 224 公分，那麼門的寬是多少公分？",
+                            options: ["70 公分", "80 公分", "85 公分", "90 公分"],
+                            answerIndex: 1,
+                            explanation: "高 : 寬 = 14 : 5 = 224 : □。224 ÷ 14 = 16 倍，因此寬 = 5 × 16 = 80 公分。"
+                        },
+                        similar: {
+                            question: "【強化類似題】旗幟的長和寬之比是 8 : 5。若長是 120 公分，寬是多少公分？",
+                            options: ["65 公分", "70 公分", "75 公分", "80 公分"],
+                            answerIndex: 2,
+                            explanation: "120 ÷ 8 = 15 倍。寬 = 5 × 15 = 75 公分。"
+                        }
+                    },
+                    {
+                        topic: "混合液體部分對全部比值（試卷選擇第 4 題）",
+                        primary: {
+                            question: "【試卷選擇第 4 題】將 50 cc 的鮮奶加入 150 cc 的紅茶中調製成 200 cc 的奶茶。下列關於比例的敘述何者完全正確？",
+                            options: [
+                                "紅茶和牛奶的比是 50 : 150",
+                                "紅茶和奶茶的比是 150 : 200（化簡為 3 : 4）",
+                                "奶茶和牛奶的比是 150 : 200",
+                                "奶茶和紅茶的比是 200 : 50"
+                            ],
+                            answerIndex: 1,
+                            explanation: "紅茶 150 cc，奶茶 200 cc，紅茶和奶茶的比是 150 : 200 = 3 : 4，比值為 3/4。"
+                        },
+                        similar: {
+                            question: "【強化類似題】安安調製芭柳汁，芭樂汁 300 毫升、柳橙汁 200 毫升，請問「芭樂汁對柳橙汁」的比值是多少？",
+                            options: ["2/3", "3/2 (即 1.5)", "3/5", "2/5"],
+                            answerIndex: 1,
+                            explanation: "比是 300 : 200。比值 = 前項 ÷ 後項 = 300 ÷ 200 = 3/2 = 1.5。"
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // Helper to get active question database
+        function getActiveDatabase() {
+            return (difficultyMode === 'advanced') ? questDatabaseAdvanced : questDatabaseNormal;
+        }
+
+        // Difficulty Mode Switcher
+        function setDifficultyMode(mode) {
+            playSound('step');
+            difficultyMode = mode;
+            currentStageIndex = 0;
+            isAnsweringSimilar = false;
+
+            const btnNormal = document.getElementById('btnModeNormal');
+            const btnAdvanced = document.getElementById('btnModeAdvanced');
+            const pill = document.getElementById('modeStatusPill');
+            const mapBoard = document.getElementById('mapBoardContainer');
+
+            if (mode === 'advanced') {
+                btnAdvanced.className = "px-4 py-2 rounded-xl font-black text-sm md:text-base transition bg-purple-600 text-white shadow";
+                btnNormal.className = "px-4 py-2 rounded-xl font-black text-sm md:text-base transition text-amber-800 hover:bg-amber-50";
+                pill.className = "text-sm font-black text-purple-900 bg-purple-100 px-3.5 py-1 rounded-full border border-purple-300";
+                pill.innerText = "當前模式：🔥 菁英進階挑戰 (中上難度)";
+                mapBoard.className = "bg-gradient-to-b from-purple-100 via-rose-50 to-amber-50 rounded-3xl p-6 border-4 border-purple-300 shadow-md relative overflow-hidden transition-all duration-300";
+            } else {
+                btnNormal.className = "px-4 py-2 rounded-xl font-black text-sm md:text-base transition bg-amber-500 text-white shadow";
+                btnAdvanced.className = "px-4 py-2 rounded-xl font-black text-sm md:text-base transition text-purple-800 hover:bg-purple-50";
+                pill.className = "text-sm font-black text-amber-800 bg-amber-100 px-3.5 py-1 rounded-full border border-amber-200";
+                pill.innerText = "當前模式：🌱 基礎核心模式";
+                mapBoard.className = "bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 rounded-3xl p-6 border-4 border-emerald-200 shadow-md relative overflow-hidden transition-all duration-300";
+            }
+
+            renderUnitButtons();
+            renderAdventureStage();
+        }
 
         // Formula Cards Data (Click to enlarge)
         const formulaCardsData = [
@@ -1223,15 +1724,20 @@
         function renderUnitButtons() {
             const container = document.getElementById('unitBtnContainer');
             container.innerHTML = '';
-            questDatabase.forEach((u, idx) => {
+            const db = getActiveDatabase();
+
+            db.forEach((u, idx) => {
                 const btn = document.createElement('button');
+                const isSelected = (idx === currentUnitIndex);
                 btn.className = `p-3 rounded-2xl font-black text-sm md:text-base transition text-left flex flex-col justify-between border-2 ${
-                    idx === currentUnitIndex
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-md scale-102'
+                    isSelected
+                        ? (difficultyMode === 'advanced'
+                            ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-102'
+                            : 'bg-amber-500 text-white border-amber-600 shadow-md scale-102')
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-amber-50'
                 }`;
                 btn.innerHTML = `
-                    <span class="text-xs ${idx === currentUnitIndex ? 'text-amber-100' : 'text-slate-400'} font-bold">小島 ${idx + 1}</span>
+                    <span class="text-xs ${isSelected ? 'text-amber-100' : 'text-slate-400'} font-bold">小島 ${idx + 1}</span>
                     <span class="truncate mt-1">${u.unitTitle.split('：')[1]}</span>
                 `;
                 btn.onclick = () => {
@@ -1252,9 +1758,16 @@
 
         // --- Adventure Map & Quiz Rendering ---
         function renderAdventureStage() {
-            const currentUnit = questDatabase[currentUnitIndex];
+            const db = getActiveDatabase();
+            const currentUnit = db[currentUnitIndex];
             document.getElementById('currentUnitTitle').innerText = currentUnit.unitTitle;
             document.getElementById('currentStageNum').innerText = currentStageIndex + 1;
+
+            if (difficultyMode === 'advanced') {
+                document.getElementById('mapSubtitle').innerText = "🔥 菁英試煉！題型具備深度思考，答對前進，答錯有同考點類似題！";
+            } else {
+                document.getElementById('mapSubtitle').innerText = "幫助探險貓咪隊長走到終點打開金幣寶箱！";
+            }
 
             // Update Progress Line
             const progressPercent = ((currentStageIndex) / 4) * 80 + 10;
@@ -1273,7 +1786,9 @@
 
                 let nodeCircleClass = '';
                 if (isCurrent) {
-                    nodeCircleClass = 'w-14 h-14 md:w-16 md:h-16 rounded-3xl bg-amber-400 border-4 border-white shadow-xl flex items-center justify-center font-black text-xl text-white ring-4 ring-amber-300 ring-offset-2 scale-110';
+                    nodeCircleClass = (difficultyMode === 'advanced')
+                        ? 'w-14 h-14 md:w-16 md:h-16 rounded-3xl bg-purple-500 border-4 border-white shadow-xl flex items-center justify-center font-black text-xl text-white ring-4 ring-purple-300 ring-offset-2 scale-110'
+                        : 'w-14 h-14 md:w-16 md:h-16 rounded-3xl bg-amber-400 border-4 border-white shadow-xl flex items-center justify-center font-black text-xl text-white ring-4 ring-amber-300 ring-offset-2 scale-110';
                 } else if (isPassed) {
                     nodeCircleClass = 'w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-500 border-3 border-white shadow-md flex items-center justify-center font-black text-lg text-white';
                 } else {
@@ -1283,14 +1798,16 @@
                 nodeDiv.innerHTML = `
                     ${isCurrent ? `
                         <div class="absolute -top-12 md:-top-14 flex flex-col items-center animate-cat-hop">
-                            <span class="bg-amber-600 text-white font-black text-xs px-2 py-0.5 rounded-full shadow whitespace-nowrap mb-0.5">喵嗚～衝呀！</span>
+                            <span class="${difficultyMode === 'advanced' ? 'bg-purple-700' : 'bg-amber-600'} text-white font-black text-xs px-2 py-0.5 rounded-full shadow whitespace-nowrap mb-0.5">
+                                ${difficultyMode === 'advanced' ? '🔥 進階突破！' : '喵嗚～衝呀！'}
+                            </span>
                             <span class="text-3xl md:text-4xl filter drop-shadow">🐱🎒</span>
                         </div>
                     ` : ''}
                     <div class="${nodeCircleClass}">
                         ${isPassed ? '✓' : (i + 1)}
                     </div>
-                    <span class="text-xs font-bold mt-2 ${isCurrent ? 'text-amber-800 font-black' : 'text-slate-500'}">關卡 ${i+1}</span>
+                    <span class="text-xs font-bold mt-2 ${isCurrent ? (difficultyMode === 'advanced' ? 'text-purple-900 font-black' : 'text-amber-800 font-black') : 'text-slate-500'}">關卡 ${i+1}</span>
                 `;
                 nodesContainer.appendChild(nodeDiv);
             }
@@ -1312,16 +1829,27 @@
         }
 
         function renderQuizQuestion() {
-            const currentUnit = questDatabase[currentUnitIndex];
+            const db = getActiveDatabase();
+            const currentUnit = db[currentUnitIndex];
             const stageData = currentUnit.stages[currentStageIndex];
             const qData = isAnsweringSimilar ? stageData.similar : stageData.primary;
 
             document.getElementById('questionTypeBadge').innerText = isAnsweringSimilar ? '⚠️ 同考點強化類似題' : `關卡 ${currentStageIndex + 1} 核心挑戰`;
             document.getElementById('questionTypeBadge').className = isAnsweringSimilar
                 ? 'bg-rose-100 text-rose-800 text-sm md:text-base font-black px-3 py-1 rounded-xl'
-                : 'bg-amber-100 text-amber-800 text-sm md:text-base font-black px-3 py-1 rounded-xl';
+                : (difficultyMode === 'advanced' ? 'bg-purple-100 text-purple-800 text-sm md:text-base font-black px-3 py-1 rounded-xl' : 'bg-amber-100 text-amber-800 text-sm md:text-base font-black px-3 py-1 rounded-xl');
 
             document.getElementById('questionTopicBadge').innerText = stageData.topic;
+
+            const diffTag = document.getElementById('questionDifficultyTag');
+            if (difficultyMode === 'advanced') {
+                diffTag.className = "bg-purple-100 text-purple-900 text-xs md:text-sm font-black px-2.5 py-1 rounded-lg border border-purple-300";
+                diffTag.innerText = "🔥 菁英進階 (中上難度)";
+            } else {
+                diffTag.className = "bg-emerald-100 text-emerald-800 text-xs md:text-sm font-black px-2.5 py-1 rounded-lg border border-emerald-300";
+                diffTag.innerText = "🌱 基礎核心";
+            }
+
             document.getElementById('questionText').innerText = qData.question;
 
             // Hide feedback
@@ -1338,7 +1866,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'btn-choice w-full p-4 md:p-5 rounded-2xl text-left font-bold text-lg md:text-xl text-slate-800 flex items-start gap-3';
                 btn.innerHTML = `
-                    <span class="font-black text-amber-600">${letterMap[oIdx]}</span>
+                    <span class="font-black ${difficultyMode === 'advanced' ? 'text-purple-600' : 'text-amber-600'}">${letterMap[oIdx]}</span>
                     <span class="flex-grow">${optText}</span>
                 `;
                 btn.onclick = () => handleAnswer(oIdx);
@@ -1347,7 +1875,8 @@
         }
 
         function handleAnswer(selectedIndex) {
-            const currentUnit = questDatabase[currentUnitIndex];
+            const db = getActiveDatabase();
+            const currentUnit = db[currentUnitIndex];
             const stageData = currentUnit.stages[currentStageIndex];
             const qData = isAnsweringSimilar ? stageData.similar : stageData.primary;
 
@@ -1363,14 +1892,15 @@
 
             if (isCorrect) {
                 playSound('correct');
-                totalStars += isAnsweringSimilar ? 1 : 2;
+                const earned = (difficultyMode === 'advanced') ? (isAnsweringSimilar ? 2 : 4) : (isAnsweringSimilar ? 1 : 2);
+                totalStars += earned;
                 document.getElementById('totalStars').innerText = totalStars;
 
                 fb.className = 'mt-6 p-6 rounded-3xl border-4 bg-emerald-50 border-emerald-300 text-emerald-900';
                 fb.innerHTML = `
                     <div class="flex items-center gap-3 mb-2">
                         <span class="text-3xl">🎉</span>
-                        <h4 class="text-xl md:text-2xl font-black text-emerald-800">太棒了！回答完全正確！</h4>
+                        <h4 class="text-xl md:text-2xl font-black text-emerald-800">太棒了！回答完全正確！(+${earned} ⭐)</h4>
                     </div>
                     <p class="text-base md:text-lg font-bold text-slate-700 leading-relaxed">${qData.explanation}</p>
                     <div class="mt-4 flex justify-end">
@@ -1426,16 +1956,15 @@
 
         function retryFallback() {
             playSound('step');
-            // If already at stage 0, stay at stage 0; otherwise retreat 1 stage
             if (currentStageIndex > 0) {
                 currentStageIndex--;
             }
-            // Enable similar fallback question
             isAnsweringSimilar = true;
             renderAdventureStage();
         }
 
         function showUnitCompleteModal() {
+            const db = getActiveDatabase();
             const modal = document.getElementById('formulaModal');
             const content = document.getElementById('modalContent');
             content.innerHTML = `
@@ -1443,7 +1972,7 @@
                     <span class="text-6xl animate-bounce inline-block">🏆👑</span>
                     <h3 class="text-3xl font-black text-amber-800">恭喜通關整座小島！</h3>
                     <p class="text-lg font-bold text-slate-600">
-                        你已經順利解開 ${questDatabase[currentUnitIndex].unitTitle} 的所有關卡！
+                        你已經順利解開 ${db[currentUnitIndex].unitTitle} 的所有關卡！
                     </p>
                     <div class="p-4 bg-amber-100 rounded-2xl text-amber-900 font-bold text-base">
                         探險家精神！多到「互動實驗室」動手玩玩，數學觀念更穩固喔！
